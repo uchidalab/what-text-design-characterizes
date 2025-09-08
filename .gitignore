@@ -1,0 +1,14 @@
+dataset/
+deep-text-recognition-benchmark/
+results/
+results_for_multimodal_20230627/
+results_for_wo_one_element/
+res_for_multimodal_/
+results_for_wo_one_element_backup/
+models/
+.notifier
+src_for_multimodal/
+src/__pycache__
+docker/.ipynb_checkpoints
+docker/.devcontainer/
+.vscode/
