@@ -13,8 +13,10 @@ res_for_multimodal_/
 results_for_wo_one_element_backup/
 !results/csv/
 !results/csv/*
+
 # models
 models/
+models.zip
 
 #src
 src_for_multimodal/

@@ -63,8 +63,15 @@ src/test_analysis.ipynb
 #### Test-Only Dataset (Provided)
 - **Size**: ~3GB
 - **Content**: Test split data only (5,641 book covers with word detection results)
-- **Download**: [Google drive](https://drive.google.com/file/d/1LOGsD00v7QT5GJ8NekDNyNnIVP0iIYLF/view?usp=sharing)
+- **Download**: [dataset.zip](https://drive.google.com/file/d/1LOGsD00v7QT5GJ8NekDNyNnIVP0iIYLF/view?usp=sharing)
 - **Purpose**: For model evaluation and testing
+
+#### Pre-trained Models (Provided)
+- **Size**: 1.6GB
+- **File**: models.zip
+- **Content**: Pre-trained model checkpoints for evaluation
+- **Download**: [models.zip](https://drive.google.com/file/d/1Iz-2WlOlejmK4WTFfsgQONphwT3GVXDi/view?usp=sharing)
+- **Purpose**: For running tests without training from scratch
 
 #### Training Dataset (User Preparation Required)
 - **Size**: ~50GB+
