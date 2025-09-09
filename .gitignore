@@ -1,14 +1,42 @@
+# dataset
 dataset/
+dataset_all/
+dataset_all.tar.gz
+dataset.zip
 deep-text-recognition-benchmark/
+
+# results
 results/
 results_for_multimodal_20230627/
 results_for_wo_one_element/
 res_for_multimodal_/
 results_for_wo_one_element_backup/
+!results/csv/
+!results/csv/*
+# models
 models/
-.notifier
+
+#src
 src_for_multimodal/
 src/__pycache__
+src/backup
+src/.ipynb_checkpoints
+
+
+# docker
 docker/.ipynb_checkpoints
 docker/.devcontainer/
+docker/README_for_me.md
+
+# others
+.notifier
 .vscode/
+.cache
+.config
+.ipython
+.jupyter
+.local
+.nv
+.bash_history
+
+create_test_dataset.py

@@ -43,19 +43,6 @@ def visualize(data,model,device):
     return mask, logits
 
 
-# def make_word_img(word,rate,font_size=12,height=64,width=32,ttf='/workspace/dataset/OpenSans-Regular.ttf'):
-#     cmap = matplotlib.pyplot.get_cmap('jet')
-#     if len(word)>10:
-#         font_size = 9
-#     full = np.full((width,height),(255*rate)).astype('uint8')
-#     img = cmap(full, bytes=True)
-#     img_text = Image.fromarray(img)
-# #     img_text = Image.new('RGB', (height,width), (int(255*0.2),0,0)) #(400,200)
-#     draw = ImageDraw.Draw(img_text)
-#     font = ImageFont.truetype(ttf, font_size)
-#     draw.text((height//2,width//2), word, fill=(255,255,255),anchor="mm",font=font)
-#     img = np.array(img_text).astype('uint8')
-#     return img
 
 def get_word_img(word,rate,font_size=35,height=180,width=120,ttf='/workspace/dataset/OpenSans-Regular.ttf'):
     cmap = matplotlib.pyplot.get_cmap('jet')
@@ -63,7 +50,11 @@ def get_word_img(word,rate,font_size=35,height=180,width=120,ttf='/workspace/dat
         font_size = 25
     img_text = Image.new('RGB', (width,height), (255,255-int(255*rate),255-int(255*rate))) #(400,200)
     draw = ImageDraw.Draw(img_text)
-    font = ImageFont.truetype(ttf, int(font_size))
+    try:
+        font = ImageFont.truetype(ttf, int(font_size))
+    except OSError:
+        # Fallback to default font if custom font is not available
+        font = ImageFont.load_default()
     draw.text((width//2,height//2), word, fill=(0,0,0),anchor="mm",font=font)
     # draw.rectangle([(0, 0), (width-1,height-1)], outline=(0,0,0),width=1)
     draw.line((width-1,0,width-1,height-1),fill=(0,0,0), width=1)
@@ -79,21 +70,36 @@ def get_visualization_res(word,rate,rate_design,font_size=35,width=180,height=12
     # 単語の描画
     img_text = Image.new('RGB', (width,height), (255,255-int(255*rate),255-int(255*rate))) #(400,200)
     draw = ImageDraw.Draw(img_text)
-    font = ImageFont.truetype(ttf, int(font_size))
+    try:
+        font = ImageFont.truetype(ttf, int(font_size))
+    except OSError:
+        # Fallback to default font if custom font is not available
+        font = ImageFont.load_default()
     draw.text((width//2,height//2), word, fill=(0,0,0),anchor="mm",font=font)
     draw.line((width-1,0,width-1,height-1),fill=(0,0,0), width=1)
     draw.line((0,0,0,height-1),fill=(0,0,0), width=1)
 #     draw.line((0,height-1,width-1,height-1),fill=(0,0,0), width=1)
     img = np.array(img_text).astype('uint8')
     # attentionの描画
+    accumulated_height = 0
     for i in range(element_num):
-        img_text = Image.new('RGB', (width//element_num,height//element_num), (255,255-int(255*rate_design[i]),255-int(255*rate_design[i]))) #(400,200)
+        # Calculate height for this element
+        if i == element_num - 1:
+            # Last element gets remaining height to avoid rounding errors
+            elem_height = height - accumulated_height
+        else:
+            elem_height = height // element_num
+        
+        img_text = Image.new('RGB', (width//element_num, elem_height), (255,255-int(255*rate_design[i]),255-int(255*rate_design[i])))
         draw = ImageDraw.Draw(img_text)
-        draw.rectangle([(0, 0), (width//element_num-1,height//element_num-1)], fill=(255,255-int(255*rate_design[i]),255-int(255*rate_design[i])), outline=(0,0,0),width=1)
+        draw.rectangle([(0, 0), (width//element_num-1, elem_height-1)], fill=(255,255-int(255*rate_design[i]),255-int(255*rate_design[i])), outline=(0,0,0),width=1)
+        
         if i == 0:
             img_tmp = np.array(img_text).astype('uint8')
         else:
             im = np.array(img_text).astype('uint8')
             img_tmp = np.vstack((img_tmp,im))
+        
+        accumulated_height += elem_height
     img = np.hstack((img,img_tmp))
     return img

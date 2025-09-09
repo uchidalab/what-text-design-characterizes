@@ -49,7 +49,11 @@ def make_word_img(word,font_size=24,hight=128,width=64,ttf='/workspace/dataset/O
         font_size = 14
     img_text = Image.new('RGB', (hight,width), (255,255,255))
     draw = ImageDraw.Draw(img_text)
-    font = ImageFont.truetype(ttf, int(font_size))
+    try:
+        font = ImageFont.truetype(ttf, int(font_size))
+    except OSError:
+        # Fallback to default font if custom font is not available
+        font = ImageFont.load_default()
     draw.text((hight//2,width//2), word, fill=(0),anchor="mm",font=font)
     img = np.array(img_text).astype('float32')
     img = img/255
@@ -167,14 +171,16 @@ def get_dataloader(batch_size,
                    data_type,
                    device = 'cuda',
                    token_num = 16, # Maximum number of words per book
-                   csv="/workspace/dataset/AmazonBookCoverImages/WordList_and_BookCoverInfo.csv",
                    debug=True,
                    data_path='/workspace/dataset/AmazonBookCoverImages/genres/',
                    semantic_model_path = '/workspace/dataset/GoogleNews-vectors-negative300.bin.gz',
                    font_model_path = "/workspace/results/ResNet50_sw128_h64_lr0.001_v3/best_model.pth",
+                   amazon_csv_path = '/workspace/dataset/AmazonBookCoverImages',
+                   book_listing_csv_path = '/workspace/dataset',
+                   valid_pickle_path = '/workspace/dataset/AmazonBookCoverImages/csv/valid.pickle',
                    ext='.jpg'):
 
-    with open('/workspace/dataset/AmazonBookCoverImages/csv/valid.pickle','rb') as f:
+    with open(valid_pickle_path,'rb') as f:
         book_cover_list_valid = pickle.load(f)
 
     model_semantic = gensim.models.KeyedVectors.load_word2vec_format(semantic_model_path, binary=True)
@@ -183,19 +189,19 @@ def get_dataloader(batch_size,
     model_font.eval()
 
     if data_type == 'valid':
-        df = pd.read_csv(f"/workspace/dataset/AmazonBookCoverImages/train.csv")
+        df = pd.read_csv(f"{amazon_csv_path}/train.csv")
         df = df[df['split']=="train"].reset_index(drop=True)
         df = df[df['hight']>14]
         df = df[df['width']>14]
-        df_org = pd.read_csv(f'/workspace/dataset/book30-listing-train.csv'\
-                         ,encoding='cp932',names=("Amazon ID (ASIN)","Filename","Image URL","Title","Author","Category ID","Category"))
+        df_org = pd.read_csv(f'{book_listing_csv_path}/book30-listing-train.csv',
+                         encoding='cp932',names=("Amazon ID (ASIN)","Filename","Image URL","Title","Author","Category ID","Category"))
     else:
-        df = pd.read_csv(f"/workspace/dataset/AmazonBookCoverImages/{data_type}.csv")
+        df = pd.read_csv(f"{amazon_csv_path}/{data_type}.csv")
         df = df[df['split']==data_type].reset_index(drop=True)
         df = df[df['hight']>14]
         df = df[df['width']>14]
-        df_org = pd.read_csv(f'/workspace/dataset/book30-listing-{data_type}.csv'\
-                         ,encoding='cp932',names=("Amazon ID (ASIN)","Filename","Image URL","Title","Author","Category ID","Category"))
+        df_org = pd.read_csv(f'{book_listing_csv_path}/book30-listing-{data_type}.csv',
+                         encoding='cp932',names=("Amazon ID (ASIN)","Filename","Image URL","Title","Author","Category ID","Category"))
     df = pd.merge(df_org,df,on="Filename")
     df_tmp = df[~df['Filename'].duplicated()]
     book_cover_list = list(df_tmp["folder"].unique())

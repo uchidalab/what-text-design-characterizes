@@ -35,5 +35,6 @@ ENV HOME "/root"
 
 # user
 ARG wkdir="/workspace/"
+RUN mkdir -p ${wkdir} && chmod 777 ${wkdir}
 
 
